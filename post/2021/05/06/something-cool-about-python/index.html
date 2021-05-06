@@ -83,19 +83,19 @@
 <a href="https://www.google.com">Link to google</a></p>
 <pre class="python"><code>print(&quot;hello world&quot;)</code></pre>
 <pre><code>## hello world</code></pre>
-<p>Okay Dr.Woodward wants me to show yall how magic can be done. I present to you the greatest magic trick in SDS 348…. Reticulate!</p>
+<p>Okay Dr.Woodward wants me to show yall how magic can be done. I present to you the greatest magic trick in SDS 348…. Reticulate! Basically one can use Python and R at the same time!</p>
 <pre class="r"><code>#R code chunk
 library(reticulate)
 matplotlib &lt;- import(&quot;matplotlib&quot;)
 matplotlib$use(&quot;Agg&quot;, force = TRUE) 
 
 hi&lt;-&quot;Hello!&quot;</code></pre>
-<p>Printing using R and Pythong variables using R</p>
+<p>Printing using R and Python variables in Python</p>
 <pre class="python"><code>#Python code chunk
 hi=&quot;Hi EVERYONE!&quot;
 print(r.hi,hi) #access R-defined objects with r. </code></pre>
 <pre><code>## Hello! Hi EVERYONE!</code></pre>
-<p>Printing using R and Python variables using R</p>
+<p>Printing using R and Python variables in R</p>
 <pre class="r"><code>#R code chunk
 cat(c(hi,py$hi)) #access Python-defined objects with py$</code></pre>
 <pre><code>## Hello! Hi EVERYONE!</code></pre>

@@ -23,8 +23,7 @@
       
       <guid>/post/2021/05/06/something-cool-about-python/</guid>
       <description>Here I present to you the power of the first line of code anyone should be able to do when they program. If you don’t trust me then go on google and check for yourself: Link to google
-print(&amp;quot;hello world&amp;quot;) ## hello world Okay Dr.Woodward wants me to show yall how magic can be done. I present to you the greatest magic trick in SDS 348…. Reticulate!
-#R code chunk library(reticulate) matplotlib &amp;lt;- import(&amp;quot;matplotlib&amp;quot;) matplotlib$use(&amp;quot;Agg&amp;quot;, force = TRUE) hi&amp;lt;-&amp;quot;Hello!</description>
+print(&amp;quot;hello world&amp;quot;) ## hello world Okay Dr.Woodward wants me to show yall how magic can be done. I present to you the greatest magic trick in SDS 348…. Reticulate! Basically one can use Python and R at the same time!</description>
     </item>
     
     <item>

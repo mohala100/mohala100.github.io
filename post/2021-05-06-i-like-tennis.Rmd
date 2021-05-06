@@ -15,7 +15,7 @@ print("hello world")
 ```
 
 
-Okay Dr.Woodward wants me to show yall how magic can be done. I present to you the greatest magic trick in SDS 348....  Reticulate!
+Okay Dr.Woodward wants me to show yall how magic can be done. I present to you the greatest magic trick in SDS 348....  Reticulate! Basically one can use Python and R at the same time!
 ```{R}
 #R code chunk
 library(reticulate)
@@ -25,14 +25,14 @@ matplotlib$use("Agg", force = TRUE)
 hi<-"Hello!"
 ```
 
-Printing using R and Pythong variables using R
+Printing using R and Python variables in Python
 ```{python}
 #Python code chunk
 hi="Hi EVERYONE!"
 print(r.hi,hi) #access R-defined objects with r. 
 ```
 
-Printing using R and Python variables using R
+Printing using R and Python variables in R
 ```{R}
 #R code chunk
 cat(c(hi,py$hi)) #access Python-defined objects with py$

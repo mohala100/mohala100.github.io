@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Mohanad Elchouemi</title>
-    <link>/post/</link>
-    <description>Recent content in Posts on Mohanad Elchouemi</description>
+    <title>Python on Mohanad Elchouemi</title>
+    <link>/categories/python/</link>
+    <description>Recent content in Python on Mohanad Elchouemi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Thu, 06 May 2021 21:13:14 -0500</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 06 May 2021 21:13:14 -0500</lastBuildDate><atom:link href="/categories/python/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Something Cool about Python</title>
       <link>/post/2021/05/06/something-cool-about-python/</link>

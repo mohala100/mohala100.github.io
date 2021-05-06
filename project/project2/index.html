@@ -60,7 +60,7 @@
  
 <div class="blog-title">
           <h4>
-         January 1, 0001 
+         April 6, 2021 
             &nbsp;&nbsp;
             
           </h4>
@@ -168,7 +168,7 @@ mean(new[new$ECRP==&quot;no&quot;,]$mappability)
 {hist(rand_dist,main=&quot;&quot;,ylab=&quot;&quot;); abline(v = c(-data_2_diff, data_2_diff),col=&quot;red&quot;)}</code></pre>
 <p><img src="../../project/project2_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>mean(rand_dist&gt;0.004291492 | rand_dist &lt; -0.004291492)</code></pre>
-<pre><code>## [1] 0.2458</code></pre>
+<pre><code>## [1] 0.2504</code></pre>
 <p>H0: Mean mappability between Extra-Cellular Receptor Proteins and non Extra-Cellular Receptor Proteins is the same.</p>
 <p>HA: Mean Mappability between Extra-Cellular Receptor Proteins and non Extra-Cellular Receptor Proteins is different.</p>
 <p>After running a randomized difference of means through resampling, we fail to reject the null hypothesis. We can conclude that the mean mappability difference between Extra-Cellular Receptor Protein transcripts and non Extra-Cellular Receptor Protein transcripts is not significantly different.</p>
@@ -269,8 +269,8 @@ samp_distn&lt;-replicate(5000, {
 })
 ## Estimated SEs
 samp_distn %&gt;% t %&gt;% as.data.frame %&gt;% summarize_all(sd)</code></pre>
-<pre><code>##   (Intercept)   ECRPyes rpf_count ECRPyes:rpf_count
-## 1   0.4786657 0.9328184 0.0548819         0.1002576</code></pre>
+<pre><code>##   (Intercept)  ECRPyes  rpf_count ECRPyes:rpf_count
+## 1   0.4857358 0.933311 0.05582398         0.1006075</code></pre>
 <pre class="r"><code>## Robust SEs
 coeftest(fit, vcov=vcovHC(fit))[,1:2]</code></pre>
 <pre><code>##                     Estimate Std. Error

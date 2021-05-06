@@ -5,11 +5,12 @@
     <link>/project/</link>
     <description>Recent content in Projects on Mohanad Elchouemi</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-US</language><atom:link href="/project/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-US</language>
+    <lastBuildDate>Thu, 06 May 2021 21:13:14 -0500</lastBuildDate><atom:link href="/project/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Project 1: Exploratory Data Analysis</title>
       <link>/project/project1/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 06 May 2021 21:13:14 -0500</pubDate>
       
       <guid>/project/project1/</guid>
       <description>Introduction Dataset 1 is and dataset 2 both come from the US Department of Education. Dataset 1 contains data that pertains to US college diversity such as the proportion of each race and gender relative to the entire student population. On the other hand, Dataset 2 contains data that pertains to these college’s tuition and overall cost. Both were easily obtained from the tidytuesday GitHub. Dataset 3 came from the US Census Bureau and it contains classifications regarding what region a state belongs too.</description>
@@ -18,7 +19,7 @@
     <item>
       <title>Project 2: Modeling, Testing, and Predicting</title>
       <link>/project/project2/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 06 Apr 2021 21:13:14 -0500</pubDate>
       
       <guid>/project/project2/</guid>
       <description>Introduction data &amp;lt;- read.csv(&amp;quot;dataset_for_project2.csv&amp;quot;) %&amp;gt;% select(-c(1,14,13,11,10,9)) %&amp;gt;% select(-c(4,5)) %&amp;gt;% rename(mappability = X30) %&amp;gt;% mutate(rpf_count = log2(rpf_edited_count),prot_count = log2(prot_count)) %&amp;gt;% select(-c(rpf_edited_count)) data %&amp;gt;% glimpse() ## Rows: 2,326 ## Columns: 6 ## $ GENE_NAME3 &amp;lt;fct&amp;gt; AAAS, AAK1, AAMP, AARS2, ABCB6, ABCB8, ABCE1, ABCF1, ABCF3, ABHD10, ABHD11, A… ## $ prot_count &amp;lt;dbl&amp;gt; 12.494207, 8.570840, 11.728127, 11.456128, 9.670122, 12.397813, 16.229376, 15… ## $ ECRP &amp;lt;fct&amp;gt; no, no, yes, no, yes, no, no, no, no, no, no, no, yes, yes, no, no, yes, no, … ## $ CDS_length &amp;lt;dbl&amp;gt; 1592, 2837, 1256, 2909, 2480, 2108, 1751, 2489, 2081, 872, 899, 1148, 584, 13… ## $ mappability &amp;lt;dbl&amp;gt; 0.</description>

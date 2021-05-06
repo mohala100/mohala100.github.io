@@ -1,0 +1,19 @@
+---
+title: "How to play tennis"
+author: "Mohanad Elchouemi"
+categories: ["R"]
+tags: ["R Markdown", "plot", "regression"]
+---
+
+anything i want to do i can
+
+
+```{r}
+print("hello world")
+```
+
+[Link to project 1](/project/project1/)
+
+[Link to google](https://www.google.com)
+
+![](/img/forWebby.jpeg)

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Mohanad Elchouemi" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project 2: Modeling, Testing, and Predicting</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project2/">Project 2: Modeling, Testing, and Predicting</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="introduction" class="section level3">
+<h3>Introduction</h3>
+<pre class="r"><code>data &lt;- read.csv(&quot;dataset_for_project2.csv&quot;) %&gt;% select(-c(1,14,13,11,10,9)) %&gt;% select(-c(4,5)) %&gt;% rename(mappability = X30) %&gt;% mutate(rpf_count = log2(rpf_edited_count),prot_count = log2(prot_count)) %&gt;% select(-c(rpf_edited_count))
+
+data %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 2,326
+## Columns: 6
+## $ GENE_NAME3 &lt;fct&gt; AAAS, AAK1, AAMP, AARS2, ABCB6,
+ABCB8, ABCE1, ABCF1, ABCF3, ABHD10, ABHD11, A…
+## $ prot_count &lt;dbl&gt; 12.494207, 8.570840, 11.728127,
+11.456128, 9.670122, 12.397813, 16.229376, 15…
+## $ ECRP &lt;fct&gt; no, no, yes, no, yes, no, no, no, no, no,
+no, no, yes, yes, no, no, yes, no, …
+## $ CDS_length &lt;dbl&gt; 1592, 2837, 1256, 2909, 2480, 2108,
+1751, 2489, 2081, 872, 899, 1148, 584, 13…
+## $ mappability &lt;dbl&gt; 0.9840220, 0.9723968, 0.9846235,
+0.9593581, 0.9902685, 0.9938074, 0.9925392, …
+## $ rpf_count &lt;dbl&gt; 8.189825, 7.169925, 9.257388,
+6.906891, 7.515700, 8.483816, 9.897845, 9.32192…</code></pre>
+<p>This dataset comes from my research at the Cenik Lab. We are designing a model that can predict gene expression based off of ribosomal profiling data. This dataset is a merged dataset of ribosomal profiling and proteomics counts. It contains the different genes with their log2 ribosomal profiling counts, log2 proteomics count, whether the gene is classified as an extra-cellular receptor proteins (ECRP) or not, the length of the coding strand of that gene, and the mappability of the gene’s transcript on on the human genome depending on if its 30 base pairs long. There are 2326 unique observations!</p>
+</div>
+<div id="manova-testing" class="section level3">
+<h3>MANOVA testing</h3>
+<pre class="r"><code>man1&lt;-manova(cbind(rpf_count,prot_count,CDS_length,mappability)~ECRP, data=data)
+summary(man1)</code></pre>
+<pre><code>## Df Pillai approx F num Df den Df Pr(&gt;F)
+## ECRP 1 0.13817 93.028 4 2321 &lt; 2.2e-16 ***
+## Residuals 2324
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>hist(data$CDS_length)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-2-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot(data$rpf_count,data$prot_count)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-2-2.png" width="768" style="display: block; margin: auto;" />
+Some of the MANOVA assumptions include, random samples and independent observations which definitely has been met. Multivariate normality is met for most of the variables, however, there is a skew for the CDS variable. There is linear relationships among the DVs!</p>
+</div>
+<div id="univariate-anovas" class="section level3">
+<h3>Univariate ANOVAs</h3>
+<pre class="r"><code>summary.aov(man1)</code></pre>
+<pre><code>## Response rpf_count :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## ECRP 1 231.2 231.245 130.89 &lt; 2.2e-16 ***
+## Residuals 2324 4105.7 1.767
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response prot_count :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## ECRP 1 2597.2 2597.17 359.22 &lt; 2.2e-16 ***
+## Residuals 2324 16802.6 7.23
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response CDS_length :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## ECRP 1 48056959 48056959 26.954 2.264e-07 ***
+## Residuals 2324 4143477504 1782908
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response mappability :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## ECRP 1 0.0097 0.0096661 1.3284 0.2492
+## Residuals 2324 16.9100 0.0072762</code></pre>
+<p>Since there are only two groups, no need to do a post-hoc t test.</p>
+</div>
+<div id="bonferroni-correction-type-i-error-discussion" class="section level3">
+<h3>Bonferroni correction, Type I error &amp; Discussion</h3>
+<pre class="r"><code>0.05/5</code></pre>
+<pre><code>## [1] 0.01</code></pre>
+<pre class="r"><code>1 - 0.95^5</code></pre>
+<pre><code>## [1] 0.2262191</code></pre>
+<p>We were performed a total 5 tests, giving us a type I probability of 0.2262 and an adjusted significance level of 0.01.</p>
+<p>For the ribosomal profiling counts, proteomics count and CDS_lengths, there is a significant difference between ECRP and non ECRP transcripts. However, for mappability, there doesn’t appear to be a significant difference between the two groups.</p>
+</div>
+<div id="randomization-on-the-mean-difference-of-the-mappability-between-ecrp-transcripts-and-non-ecrp-transcripts.-will-do-a-mean-difference" class="section level3">
+<h3>Randomization on the mean difference of the mappability between ECRP transcripts and non ECRP transcripts. Will do a mean difference!</h3>
+<pre class="r"><code>data_2 &lt;- data %&gt;% select(mappability,ECRP)
+
+data_2_diff &lt;- mean(data_2[data_2$ECRP == &quot;yes&quot;,]$mappability) - mean(data_2[data_2$ECRP == &quot;no&quot;,]$mappability)
+
+
+rand_dist&lt;-vector()
+for(i in 1:5000){
+new&lt;-data.frame(mappability=sample(data_2$mappability), ECRP = data_2$ECRP)
+rand_dist[i]&lt;-mean(new[new$ECRP==&quot;yes&quot;,]$mappability)-
+mean(new[new$ECRP==&quot;no&quot;,]$mappability)
+}
+
+{hist(rand_dist,main=&quot;&quot;,ylab=&quot;&quot;); abline(v = c(-data_2_diff, data_2_diff),col=&quot;red&quot;)}</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>mean(rand_dist&gt;0.004291492 | rand_dist &lt; -0.004291492)</code></pre>
+<pre><code>## [1] 0.2458</code></pre>
+<p>H0: Mean mappability between Extra-Cellular Receptor Proteins and non Extra-Cellular Receptor Proteins is the same.</p>
+<p>HA: Mean Mappability between Extra-Cellular Receptor Proteins and non Extra-Cellular Receptor Proteins is different.</p>
+<p>After running a randomized difference of means through resampling, we fail to reject the null hypothesis. We can conclude that the mean mappability difference between Extra-Cellular Receptor Protein transcripts and non Extra-Cellular Receptor Protein transcripts is not significantly different.</p>
+</div>
+<div id="building-a-linear-regression-model" class="section level3">
+<h3>Building a linear regression model</h3>
+<pre class="r"><code>fit&lt;-lm(prot_count ~ rpf_count*ECRP, data=data); summary(fit)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = prot_count ~ rpf_count * ECRP, data = data)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -8.8778 -1.6058 0.0311 1.6116 12.3985
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 7.99832 0.43266 18.486 &lt; 2e-16 ***
+## rpf_count 0.74708 0.04922 15.177 &lt; 2e-16 ***
+## ECRPyes -1.10260 0.70585 -1.562 0.118
+## rpf_count:ECRPyes 0.30239 0.07673 3.941 8.36e-05 ***
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Residual standard error: 2.42 on 2322 degrees of freedom
+## Multiple R-squared: 0.2993, Adjusted R-squared: 0.2984
+## F-statistic: 330.6 on 3 and 2322 DF, p-value: &lt; 2.2e-16</code></pre>
+<div id="interpretting-the-coefficient-estimates" class="section level4">
+<h4>Interpretting the coefficient estimates</h4>
+<p>Predicted proteomics count for a gene transcript that is not an ECRP transcript, with 0 ribosomal profiling counts, is 9.412.</p>
+<p>For every 1 unit increase in ribosomal profiling count, predicted proteomics count goes up by 0.747 for non ECRP genes.</p>
+<p>For a transcript that is ECRP with zero ribosomal profiling counts, it has a predicted proteomics count that is -1.1026 lower than non ECRP transcripts.</p>
+<p>Slope of rpf_count on proteomics count for ECRP transcripts is 0.30239 greater than for non ECRP transcripts.</p>
+</div>
+</div>
+<div id="plotting-the-regression" class="section level3">
+<h3>Plotting the Regression</h3>
+<pre class="r"><code>data %&gt;% select(ECRP, rpf_count, prot_count) %&gt;% na.omit %&gt;% ggplot(aes(x = rpf_count, y = prot_count, color=ECRP))+
+geom_point()+geom_smooth(method=&quot;lm&quot;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;" />
+Using the adjusdted R squared value, 0.2984 is the proportion of the variation the model is able to explain.</p>
+</div>
+<div id="checking-assumptions" class="section level3">
+<h3>Checking assumptions</h3>
+<div id="homoskedsaticity-linearity-and-normality" class="section level4">
+<h4>Homoskedsaticity, Linearity and Normality</h4>
+<pre class="r"><code>resids &lt;- fit$residuals
+fitvals &lt;- fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color=&#39;red&#39;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot()+geom_histogram(aes(resids),bins=10)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-8-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>library(lmtest)
+library(sandwich)
+
+bptest(fit)</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  fit
+## BP = 18.974, df = 3, p-value = 0.0002768</code></pre>
+<pre class="r"><code>ks.test(resids, &quot;pnorm&quot;, mean=0, sd(resids))</code></pre>
+<pre><code>## 
+##  One-sample Kolmogorov-Smirnov test
+## 
+## data:  resids
+## D = 0.012895, p-value = 0.834
+## alternative hypothesis: two-sided</code></pre>
+<p>Data appears to be linear from the scatter plot. The data points on the far left appear to be outliers as there are over 2,000 data points here. We fail to reject the null hypothesis for the two tests for Homoskedsaticity and normality. That means that we can assume that the data is homoskedsatic and normal!</p>
+</div>
+</div>
+<div id="model-with-robust-standard-errors" class="section level3">
+<h3>Model with Robust Standard Errors</h3>
+<pre class="r"><code>coeftest(fit,vcov=vcovHC(fit))</code></pre>
+<pre><code>##
+## t test of coefficients:
+##
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 7.998322 0.482674 16.5708 &lt; 2e-16 ***
+## rpf_count 0.747076 0.055457 13.4712 &lt; 2e-16 ***
+## ECRPyes -1.102603 0.946426 -1.1650 0.24413
+## rpf_count:ECRPyes 0.302391 0.101925 2.9668 0.00304 **
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<p>Even after running a model with robust standard errors, we have the same significant results as before. The rpf_count (the slope) and the interaction between rpf_count and ECRP were what yielded significant results. All of the significant results had their t values decrease slightly from the original SE, but this still wasn’t enough to make the results not significant.</p>
+</div>
+<div id="bootstrapped-ses-vs-original-ses-vs-robust-ses" class="section level3">
+<h3>Bootstrapped SEs vs Original SEs vs Robust SEs</h3>
+<pre class="r"><code>meddat &lt;- data %&gt;% select(ECRP,prot_count,rpf_count)
+
+# repeat 5000 times
+samp_distn&lt;-replicate(5000, {
+  boot_dat &lt;- sample_frac(meddat, replace=T) #take bootstrap sample of rows
+  fit &lt;- lm(prot_count~ECRP*rpf_count, data=boot_dat) #fit model on bootstrap sample
+  coef(fit) #save coefs
+})
+## Estimated SEs
+samp_distn %&gt;% t %&gt;% as.data.frame %&gt;% summarize_all(sd)</code></pre>
+<pre><code>##   (Intercept)   ECRPyes rpf_count ECRPyes:rpf_count
+## 1   0.4786657 0.9328184 0.0548819         0.1002576</code></pre>
+<pre class="r"><code>## Robust SEs
+coeftest(fit, vcov=vcovHC(fit))[,1:2]</code></pre>
+<pre><code>##                     Estimate Std. Error
+## (Intercept)        7.9983218 0.48267435
+## rpf_count          0.7470761 0.05545742
+## ECRPyes           -1.1026035 0.94642627
+## rpf_count:ECRPyes  0.3023909 0.10192526</code></pre>
+<pre class="r"><code>## Normal-theory SEs
+coeftest(fit)[,1:2]</code></pre>
+<pre><code>##                     Estimate Std. Error
+## (Intercept)        7.9983218 0.43265763
+## rpf_count          0.7470761 0.04922418
+## ECRPyes           -1.1026035 0.70584688
+## rpf_count:ECRPyes  0.3023909 0.07673063</code></pre>
+<p>After running the same regression model with bootstrapped standard errors, based off of the SEs, I don’t think there is any significant change in the resulting p-values.For the intercept, the robust SE actually lies in between the values calculated using robust and original SEs. For the ECRP yes variable its bootstrapped SE is also in between the SE values calculated for robust and original SE. For the rpf_count Coefficient bootstrapped SE, it also was between the values for robust and SE original SE. For the interaction between ECRP yes and rpf_count, the bootstrapped SE was also between the values for robust and SE original SE. Generally speaking, the robust standard errors were always the more conservative estimates, while the original SEs were the smallest estimates. Since the bootstrapped standard errors were between that of the original and robust SEs, the p values would still be the same and not change the significance of anything.</p>
+</div>
+<div id="fitting-a-logistic-regression-model" class="section level3">
+<h3>Fitting a logistic regression model</h3>
+<div id="interpreting-coefficients" class="section level4">
+<h4>Interpreting coefficients</h4>
+<pre class="r"><code>data_5 &lt;-  data %&gt;% 
+  select(prot_count,rpf_count,ECRP) %&gt;%
+  mutate(y = ifelse(ECRP == &quot;yes&quot;,1,0))
+
+fit&lt;-glm(y~prot_count + rpf_count, data=data_5, family=&quot;binomial&quot;)
+
+summary(fit)</code></pre>
+<pre><code>##
+## Call:
+## glm(formula = y ~ prot_count + rpf_count, family =
+&quot;binomial&quot;,
+## data = data_5)
+##
+## Deviance Residuals:
+## Min 1Q Median 3Q Max
+## -1.7915 -0.8631 -0.6257 1.0473 2.3106
+##
+## Coefficients:
+## Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) -5.8636 0.3600 -16.289 &lt; 2e-16 ***
+## prot_count 0.2684 0.0199 13.489 &lt; 2e-16 ***
+## rpf_count 0.1153 0.0393 2.935 0.00333 **
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## (Dispersion parameter for binomial family taken to be 1)
+##
+## Null deviance: 2994.1 on 2325 degrees of freedom
+## Residual deviance: 2660.3 on 2323 degrees of freedom
+## AIC: 2666.3
+##
+## Number of Fisher Scoring iterations: 3</code></pre>
+<pre class="r"><code>exp(coef(fit))</code></pre>
+<pre><code>## (Intercept)  prot_count   rpf_count 
+## 0.002841007 1.307892818 1.122269651</code></pre>
+<p>When both prot_count and rpf_count are 0, the odds of a transcript being ECRP is 0.00284.</p>
+<p>Controlling for proteomics count , for every 1-unit increase in ribosomal profiling count,
+odds of being an ECRP transcripts changes by a factor of 1.122.</p>
+<p>Controlling for ribosomal profiling count , for every 1-unit increase in proteomics count,
+odds of being an ECRP transcripts changes by a factor of 1.308.</p>
+</div>
+<div id="creating-a-confusion-matrix" class="section level4">
+<h4>Creating a Confusion Matrix</h4>
+<pre class="r"><code>data_5$prob &lt;-predict(fit,type=&quot;response&quot;) #save predicted probabilities
+table(predict=as.numeric(data_5$prob &gt;.5),truth=data_5$y)%&gt;%addmargins</code></pre>
+<pre><code>##        truth
+## predict    0    1  Sum
+##     0   1368  513 1881
+##     1    158  287  445
+##     Sum 1526  800 2326</code></pre>
+</div>
+<div id="the-accuracy-sensitivity-tpr-specificity-tnr-precision-ppv-and-auc-of-the-model" class="section level4">
+<h4>The Accuracy, Sensitivity (TPR), Specificity (TNR), Precision (PPV), and AUC of the model</h4>
+<pre class="r"><code>class_diag&lt;-function(probs,truth){
+  
+  tab&lt;-table(factor(probs&gt;.5,levels=c(&quot;FALSE&quot;,&quot;TRUE&quot;)),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE &amp; is.logical(truth)==FALSE) truth&lt;-as.numeric(truth)-1
+  
+  #CALCULATE EXACT AUC
+  ord&lt;-order(probs, decreasing=TRUE)
+  probs &lt;- probs[ord]; truth &lt;- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup&lt;-c(probs[-1]&gt;=probs[-length(probs)], FALSE)
+  TPR&lt;-c(0,TPR[!dup],1); FPR&lt;-c(0,FPR[!dup],1)
+  
+  n &lt;- length(TPR)
+  auc&lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+
+class_diag(data_5$prob,data_5$y)</code></pre>
+<pre><code>##         acc    sens      spec       ppv       auc
+## 1 0.7115219 0.35875 0.8964613 0.6449438 0.7156053</code></pre>
+<p>From the model created, the Accuracy is 0.71152 , Sensitivity (TPR) is 0.35875, Specificity (TNR) is 0.8964613, Precision (PPV) is 0.6449438, and AUC is 0.7156053. The sensitivity is really low, so there is a lot of false negatives and the model isn’t able to detect the ECRP really well. This means that a lot of the ECRP transcripts are classified as non ECRP.</p>
+</div>
+<div id="density-plot-of-the-log-odds" class="section level4">
+<h4>Density Plot of the log-odds</h4>
+<pre class="r"><code>data_5$logit&lt;-predict(fit,type=&quot;link&quot;) #get predicted logit scores (logodds)
+
+data_5%&gt;%ggplot()+geom_density(aes(logit,color=ECRP,fill=ECRP), alpha=.4)+
+  theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab(&quot;predictor (logit)&quot;)</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-14-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>ROC Plot</p>
+<pre class="r"><code>library(plotROC) #install.packages(plotROC)
+#geom_roc needs actual outcome (0,1) and predicted probability (or predictor if just one) 
+ROCplot&lt;-ggplot(data_5)+geom_roc(aes(d=y,m=prob), n.cuts=0) + geom_abline(slope = 1)
+ROCplot</code></pre>
+<p><img src="../../project/project2_files/figure-html/unnamed-chunk-15-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.7156053</code></pre>
+<p>The AUC calculated for this model is 0.71, which would get a Fair grade! It isn’t the best model as the AUC isn’t that high.</p>
+</div>
+</div>
+<div id="logistic-regression-but-with-all-the-variables" class="section level3">
+<h3>Logistic Regression but with all the Variables</h3>
+<pre class="r"><code>data_6 &lt;- data %&gt;% select(-GENE_NAME3) %&gt;% mutate(ECRP = ifelse(ECRP == &quot;yes&quot;,TRUE,FALSE))
+fit&lt;-glm(ECRP~.,data=data_6,family=&quot;binomial&quot;)
+summary(fit)</code></pre>
+<pre><code>##
+## Call:
+## glm(formula = ECRP ~ ., family = &quot;binomial&quot;, data =
+data_6)
+##
+## Deviance Residuals:
+## Min 1Q Median 3Q Max
+## -1.8082 -0.8625 -0.6258 1.0506 2.3229
+##
+## Coefficients:
+## Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) -5.664e+00 6.388e-01 -8.866 &lt; 2e-16 ***
+## prot_count 2.605e-01 2.454e-02 10.617 &lt; 2e-16 ***
+## CDS_length -2.217e-05 4.676e-05 -0.474 0.63549
+## mappability -2.008e-01 6.000e-01 -0.335 0.73787
+## rpf_count 1.318e-01 4.937e-02 2.670 0.00759 **
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## (Dispersion parameter for binomial family taken to be 1)
+##
+## Null deviance: 2994.1 on 2325 degrees of freedom
+## Residual deviance: 2660.0 on 2321 degrees of freedom
+## AIC: 2670
+##
+## Number of Fisher Scoring iterations: 3</code></pre>
+<pre class="r"><code>prob &lt;- predict(fit,type = &quot;response&quot;)
+
+class_diag(prob,data_6$ECRP)</code></pre>
+<pre><code>##            acc sens      spec       ppv       auc
+## TRUE 0.7132416 0.36 0.8984273 0.6501129 0.7159928</code></pre>
+<pre class="r"><code>table(predict=as.numeric(prob &gt;.5),truth=data_6$ECRP)%&gt;%addmargins</code></pre>
+<pre><code>##        truth
+## predict FALSE TRUE  Sum
+##     0    1371  512 1883
+##     1     155  288  443
+##     Sum  1526  800 2326</code></pre>
+<p>Although we included all the variables, we still got a very similar AUC as before, 0.7159928 vs 0.7156053. This is due to the fact that added variables were simply not significant and therefore didn’t contribute as much to the model. As a result, the AUC is fair and the sensitivity value is still very low. There is not really any difference between this model and the other one.</p>
+<div id="fold-cv" class="section level4">
+<h4>10-fold CV</h4>
+<pre class="r"><code>set.seed(1234)
+k=10
+
+data_oops &lt;- data_6 %&gt;% sample_frac #put rows of dataset in random order
+folds &lt;- ntile(1:nrow(data),n=10) #create fold labels
+diags&lt;-NULL
+for(i in 1:k){
+train &lt;- data_oops[folds!=i,] #create training set (all but fold i)
+test &lt;- data_oops[folds==i,] #create test set (just fold i)
+truth &lt;- test$ECRP #save truth labels from fold i
+fit &lt;- glm(ECRP~.,data=train,family=&quot;binomial&quot;)
+probs &lt;- predict(fit, newdata=test, type=&quot;response&quot;)
+diags&lt;-rbind(diags,class_diag(probs,truth))
+}
+diags%&gt;%summarize_all(mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc
+## 1 0.71324 0.3611666 0.8976123 0.6491281 0.7121655</code></pre>
+<p>After performing 10 fold cross validation, the AUC didn’t change much at all. We would still give it a fair rating. Accuracy was 0.71324, sensitivity was 0.3611666, specificity was 0.8976123, precision was 0.6491281, and AUC was 0.7121655. This AUC value can be classified as fair! Sensitivity is still very low.</p>
+</div>
+<div id="lasso" class="section level4">
+<h4>Lasso</h4>
+<pre class="r"><code>library(glmnet)
+set.seed(1234)
+
+y&lt;-as.matrix(data_6$ECRP) #grab response
+x&lt;-model.matrix(ECRP~.,data=data_6)[,-1] #grab predictors
+head(x)</code></pre>
+<pre><code>##   prot_count CDS_length mappability rpf_count
+## 1  12.494207       1592   0.9840220  8.189825
+## 2   8.570840       2837   0.9723968  7.169925
+## 3  11.728127       1256   0.9846235  9.257388
+## 4  11.456128       2909   0.9593581  6.906891
+## 5   9.670122       2480   0.9902685  7.515700
+## 6  12.397813       2108   0.9938074  8.483816</code></pre>
+<pre class="r"><code>cv&lt;-cv.glmnet(x,y,family=&quot;binomial&quot;)
+lasso&lt;-glmnet(x,y,family=&quot;binomial&quot;,lambda=cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 5 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                       s0
+## (Intercept) -3.800742905
+## prot_count   0.202328370
+## CDS_length   .          
+## mappability  .          
+## rpf_count    0.002202293</code></pre>
+<pre class="r"><code>lasso_dat &lt;- data_6 %&gt;%
+  select(prot_count, rpf_count,ECRP)
+
+
+fit&lt;-glm(ECRP~.,data=lasso_dat,family=&quot;binomial&quot;)
+prob &lt;- predict(fit,type = &quot;response&quot;)
+
+class_diag(prob,lasso_dat$ECRP)</code></pre>
+<pre><code>##            acc    sens      spec       ppv       auc
+## TRUE 0.7115219 0.35875 0.8964613 0.6449438 0.7156053</code></pre>
+<p>Out of the 4 predictor variables, only 2 of them were retained. rpf_count and and prot_count were the only two variables that were retained.</p>
+</div>
+</div>
+<div id="fold-cv-using-lasso-selected-variables" class="section level3">
+<h3>10-fold CV Using Lasso Selected Variables</h3>
+<pre class="r"><code>set.seed(1234)
+k=10
+
+data_oops &lt;- data_6 %&gt;% select(ECRP,prot_count,rpf_count)%&gt;% sample_frac #put rows of dataset in random order
+folds &lt;- ntile(1:nrow(data),n=10) #create fold labels
+diags&lt;-NULL
+for(i in 1:k){
+train &lt;- data_oops[folds!=i,] #create training set (all but fold i)
+test &lt;- data_oops[folds==i,] #create test set (just fold i)
+truth &lt;- test$ECRP #save truth labels from fold i
+fit &lt;- glm(ECRP~.,data=train,family=&quot;binomial&quot;)
+probs &lt;- predict(fit, newdata=test, type=&quot;response&quot;)
+diags&lt;-rbind(diags,class_diag(probs,truth))
+}
+diags%&gt;%summarize_all(mean)</code></pre>
+<pre><code>##         acc      sens      spec       ppv       auc
+## 1 0.7119524 0.3577137 0.8976362 0.6469831 0.7144793</code></pre>
+<p>After performing a 10-fold cv using only the variables lasso selected, the model’s out-of-sample AUC is very similar to the logistic regressions above. Once again, the other variables were not significant in the first place so they never contributed to the model!</p>
+<pre class="r"><code>data(package = .packages(all.available = TRUE))</code></pre>
+<p>…</p>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Mohanad Elchouemi" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project 1: Exploratory Data Analysis</title>
+    <meta name="generator" content="Hugo 0.83.1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project1/">Project 1: Exploratory Data Analysis</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<P style="page-break-before: always">
+<div style="page-break-after: always;"></div>
+<div id="introduction" class="section level3">
+<h3>Introduction</h3>
+<p>Dataset 1 is and dataset 2 both come from the US Department of Education. Dataset 1 contains data that pertains to US college diversity such as the proportion of each race and gender relative to the entire student population. On the other hand, Dataset 2 contains data that pertains to these college’s tuition and overall cost. Both were easily obtained from the tidytuesday GitHub. Dataset 3 came from the US Census Bureau and it contains classifications regarding what region a state belongs too. It is mainly going to be used to group the different colleges into their respective regions. This dataset was also acquired from the agency’s GitHub repository.</p>
+<p>These data sets are interesting to me because I have a brother who will be applying to colleges soon, and looking at these metrics could possibly help narrow down his college list. Additionally, with student debt increasing this could help others find cheaper upper education. I expect that colleges in the coasts will be more expensive that colleges that are in land. I believe this could be due to premium location. It is known that cost of living in states like California and New York are sky high and this could be likewise for colleges. Additionally, I believe that colleges with less diversity will be more expensive as minority groups that have historically been oppressed will find it hard to pay for colleges that have a high sticker price.</p>
+<div id="data-download-libraries" class="section level4">
+<h4>Data Download &amp; Libraries</h4>
+<p>Need to download the Library that will be used for the majority of this project.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<p>Loading all the datasets.</p>
+<pre class="r"><code>diversity &lt;- read.csv(&quot;diversity.csv&quot;) %&gt;% select(-1) %&gt;% mutate_if(is.factor, 
+    as.character)
+tuition &lt;- read.csv(&quot;tuition.csv&quot;) %&gt;% select(-1) %&gt;% mutate_if(is.factor, 
+    as.character)
+regions &lt;- read.csv(&quot;us census bureau regions and divisions.csv&quot;) %&gt;% 
+    mutate_if(is.factor, as.character)</code></pre>
+<p>Removed columns that were of no meaning to us. And made sure that the variables where in a usable data type by converting some columns to a character type.</p>
+<p>Here is an initial view of the data after getting them and before anything is done to them.</p>
+<pre class="r"><code>diversity %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 50,655
+## Columns: 5
+## $ name             &lt;chr&gt; &quot;University of Phoenix-Arizona&quot;, &quot;University of Phoe…
+## $ total_enrollment &lt;int&gt; 195059, 195059, 195059, 195059, 195059, 195059, 1950…
+## $ state            &lt;chr&gt; &quot;Arizona&quot;, &quot;Arizona&quot;, &quot;Arizona&quot;, &quot;Arizona&quot;, &quot;Arizona…
+## $ category         &lt;chr&gt; &quot;Women&quot;, &quot;American Indian / Alaska Native&quot;, &quot;Asian&quot;,…
+## $ enrollment       &lt;int&gt; 134722, 876, 1959, 31455, 13984, 1019, 58209, 19039,…</code></pre>
+<pre class="r"><code>tuition %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 2,973
+## Columns: 10
+## $ name                 &lt;chr&gt; &quot;Aaniiih Nakoda College&quot;, &quot;Abilene Christian Uni…
+## $ state                &lt;chr&gt; &quot;Montana&quot;, &quot;Texas&quot;, &quot;Georgia&quot;, &quot;Minnesota&quot;, &quot;Cal…
+## $ state_code           &lt;chr&gt; &quot;MT&quot;, &quot;TX&quot;, &quot;GA&quot;, &quot;MN&quot;, &quot;CA&quot;, &quot;CO&quot;, &quot;NY&quot;, &quot;NY&quot;, …
+## $ type                 &lt;chr&gt; &quot;Public&quot;, &quot;Private&quot;, &quot;Public&quot;, &quot;For Profit&quot;, &quot;Fo…
+## $ degree_length        &lt;chr&gt; &quot;2 Year&quot;, &quot;4 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;4 Year&quot;…
+## $ room_and_board       &lt;int&gt; NA, 10350, 8474, NA, 16648, 8782, 16030, 11660, …
+## $ in_state_tuition     &lt;int&gt; 2380, 34850, 4128, 17661, 27810, 9440, 38660, 53…
+## $ in_state_total       &lt;int&gt; 2380, 45200, 12602, 17661, 44458, 18222, 54690, …
+## $ out_of_state_tuition &lt;int&gt; 2380, 34850, 12550, 17661, 27810, 20456, 38660, …
+## $ out_of_state_total   &lt;int&gt; 2380, 45200, 21024, 17661, 44458, 29238, 54690, …</code></pre>
+<pre class="r"><code>regions %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 51
+## Columns: 4
+## $ State      &lt;chr&gt; &quot;Alaska&quot;, &quot;Alabama&quot;, &quot;Arkansas&quot;, &quot;Arizona&quot;, &quot;California&quot;, …
+## $ State.Code &lt;chr&gt; &quot;AK&quot;, &quot;AL&quot;, &quot;AR&quot;, &quot;AZ&quot;, &quot;CA&quot;, &quot;CO&quot;, &quot;CT&quot;, &quot;DC&quot;, &quot;DE&quot;, &quot;FL&quot;…
+## $ Region     &lt;chr&gt; &quot;West&quot;, &quot;South&quot;, &quot;South&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;Northea…
+## $ Division   &lt;chr&gt; &quot;Pacific&quot;, &quot;East South Central&quot;, &quot;West South Central&quot;, &quot;Mo…</code></pre>
+</div>
+</div>
+<div id="tidying-rearranging-widelong" class="section level3">
+<h3>Tidying: Rearranging Wide/Long</h3>
+<p>diversity, regions and tuition dataset are all tidy and clean.Here is a demonstration of using <code>pivot_wider()</code> and <code>pivot_longer()</code> using the diversity dataset.</p>
+<pre class="r"><code>dirty &lt;- diversity %&gt;% pivot_wider(names_from = category, values_from = enrollment) %&gt;% 
+    glimpse(100)</code></pre>
+<pre><code>## Rows: 4,604
+## Columns: 14
+## $ name                                 &lt;chr&gt; &quot;University of Phoenix-Arizona&quot;, &quot;Ivy Tech Community…
+## $ total_enrollment                     &lt;int&gt; 195059, 91179, 81459, 69395, 66046, 62304, 61642, 60…
+## $ state                                &lt;chr&gt; &quot;Arizona&quot;, &quot;Indiana&quot;, &quot;Virginia&quot;, &quot;Texas&quot;, &quot;Florida&quot;…
+## $ Women                                &lt;list&gt; [134722, 53476, 48329, 41268, 38323, 46647, 29277, …
+## $ `American Indian / Alaska Native`    &lt;list&gt; [876, 357, 447, 168, 47, 586, 173, 120, 76, 116, 36…
+## $ Asian                                &lt;list&gt; [1959, 1369, 856, 4198, 655, 2446, 3545, 3343, 3339…
+## $ Black                                &lt;list&gt; [31455, 12370, 14751, 12094, 10722, 13856, 1879, 64…
+## $ Hispanic                             &lt;list&gt; [13984, 5533, 1186, 23751, 44870, 8933, 11256, 1310…
+## $ `Native Hawaiian / Pacific Islander` &lt;list&gt; [1019, 0, 151, 0, 41, 295, 59, 129, 35, 130, 288, 5…
+## $ White                                &lt;list&gt; [58209, 61498, 39062, 23615, 4170, 28715, 37458, 33…
+## $ `Two Or More Races`                  &lt;list&gt; [19039, 1804, 1772, 1997, 226, 1558, 1644, 1841, 15…
+## $ Unknown                              &lt;list&gt; [65163, 8224, 22198, 2273, 1927, 5915, 383, 1018, 1…
+## $ `Non-Resident Foreign`               &lt;list&gt; [3355, 24, 1036, 1299, 3388, 0, 5245, 1515, 6176, 5…
+## $ `Total Minority`                     &lt;list&gt; [68332, 21433, 19163, 42208, 56561, 27674, 18556, 2…</code></pre>
+<p>The diversity dataset was originally in a long format. Using pivot wider, we took the names for the new columns from the category column and the corresponding values from the enrollment column. Now we created a column for categories such as race and gender.</p>
+<p>Now that the data is in wide form, we will use <code>pivtot_longer()</code> to turn the dataset back into long form.</p>
+<pre class="r"><code>cleaned &lt;- pivot_longer(data = dirty, cols = -c(1:4), names_to = &quot;category&quot;, 
+    values_to = &quot;enrollment&quot;) %&gt;% glimpse(100)</code></pre>
+<pre><code>## Rows: 46,040
+## Columns: 6
+## $ name             &lt;chr&gt; &quot;University of Phoenix-Arizona&quot;, &quot;University of Phoenix-Arizona&quot;, &quot;Unive…
+## $ total_enrollment &lt;int&gt; 195059, 195059, 195059, 195059, 195059, 195059, 195059, 195059, 195059, …
+## $ state            &lt;chr&gt; &quot;Arizona&quot;, &quot;Arizona&quot;, &quot;Arizona&quot;, &quot;Arizona&quot;, &quot;Arizona&quot;, &quot;Arizona&quot;, &quot;Arizo…
+## $ Women            &lt;list&gt; [134722, 134722, 134722, 134722, 134722, 134722, 134722, 134722, 134722…
+## $ category         &lt;chr&gt; &quot;American Indian / Alaska Native&quot;, &quot;Asian&quot;, &quot;Black&quot;, &quot;Hispanic&quot;, &quot;Native…
+## $ enrollment       &lt;list&gt; [876, 1959, 31455, 13984, 1019, 58209, 19039, 65163, 3355, 68332, 357, …</code></pre>
+<p>We selected all the data columns that we want to collect together and put them under the column “category” and their corresponding values in the column “enrollment”. Now our data is in a long format.</p>
+</div>
+<div id="joiningmerging" class="section level3">
+<h3>Joining/Merging</h3>
+<p>Here is where joining of all three datasets takes places.</p>
+<pre class="r"><code>combined &lt;- left_join(tuition, diversity, by = c(&quot;name&quot;, &quot;state&quot;)) %&gt;% 
+    left_join(regions, by = c(state = &quot;State&quot;)) %&gt;% select(-State.Code)
+
+combined %&gt;% pivot_wider(names_from = category, values_from = enrollment) %&gt;% 
+    head()</code></pre>
+<pre><code>## # A tibble: 6 x 25
+##   name  state state_code type  degree_length room_and_board in_state_tuition
+##   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;                  &lt;int&gt;            &lt;int&gt;
+## 1 Aani… Mont… MT         Publ… 2 Year                    NA             2380
+## 2 Abil… Texas TX         Priv… 4 Year                 10350            34850
+## 3 Abra… Geor… GA         Publ… 2 Year                  8474             4128
+## 4 Acad… Minn… MN         For … 2 Year                    NA            17661
+## 5 Acad… Cali… CA         For … 4 Year                 16648            27810
+## 6 Adam… Colo… CO         Publ… 4 Year                  8782             9440
+## # … with 18 more variables: in_state_total &lt;int&gt;, out_of_state_tuition &lt;int&gt;,
+## #   out_of_state_total &lt;int&gt;, total_enrollment &lt;int&gt;, Region &lt;chr&gt;,
+## #   Division &lt;chr&gt;, Women &lt;int&gt;, `American Indian / Alaska Native` &lt;int&gt;,
+## #   Asian &lt;int&gt;, Black &lt;int&gt;, Hispanic &lt;int&gt;, `Native Hawaiian / Pacific
+## #   Islander` &lt;int&gt;, White &lt;int&gt;, `Two Or More Races` &lt;int&gt;, Unknown &lt;int&gt;,
+## #   `Non-Resident Foreign` &lt;int&gt;, `Total Minority` &lt;int&gt;, `NA` &lt;int&gt;</code></pre>
+<pre class="r"><code>combined %&gt;% glimpse(100)</code></pre>
+<pre><code>## Rows: 24,513
+## Columns: 15
+## $ name                 &lt;chr&gt; &quot;Aaniiih Nakoda College&quot;, &quot;Aaniiih Nakoda College&quot;, &quot;Aaniiih Nakoda …
+## $ state                &lt;chr&gt; &quot;Montana&quot;, &quot;Montana&quot;, &quot;Montana&quot;, &quot;Montana&quot;, &quot;Montana&quot;, &quot;Montana&quot;, &quot;M…
+## $ state_code           &lt;chr&gt; &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;T…
+## $ type                 &lt;chr&gt; &quot;Public&quot;, &quot;Public&quot;, &quot;Public&quot;, &quot;Public&quot;, &quot;Public&quot;, &quot;Public&quot;, &quot;Public&quot;…
+## $ degree_length        &lt;chr&gt; &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;…
+## $ room_and_board       &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 10350, 10350, 10350, 103…
+## $ in_state_tuition     &lt;int&gt; 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 34…
+## $ in_state_total       &lt;int&gt; 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 45…
+## $ out_of_state_tuition &lt;int&gt; 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 34…
+## $ out_of_state_total   &lt;int&gt; 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 45…
+## $ total_enrollment     &lt;int&gt; 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 4427, 4427, 4…
+## $ category             &lt;chr&gt; &quot;Women&quot;, &quot;American Indian / Alaska Native&quot;, &quot;Asian&quot;, &quot;Black&quot;, &quot;Hispa…
+## $ enrollment           &lt;int&gt; 178, 256, 0, 0, 2, 0, 33, 0, 0, 0, 258, 2562, 18, 46, 387, 582, 0, 2…
+## $ Region               &lt;chr&gt; &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;Wes…
+## $ Division             &lt;chr&gt; &quot;Mountain&quot;, &quot;Mountain&quot;, &quot;Mountain&quot;, &quot;Mountain&quot;, &quot;Mountain&quot;, &quot;Mountai…</code></pre>
+<p><code>left_join</code> is used with the tuition dataset being the dataset on the left because we want to keep all the rows from tuition and add rows with matches from diverstiy. The reason for this is because tuition dataset has less rows(less colleges) than the diversity dataset. Doing it like this minimizes the number of NAs in the combined dataset. No rows were dropped from the tuition dataset;however, the diversity dataset had 4046 different colleges while tuition dataset had 2973 unique colleges. This resulted in 1073 unique colleges being dropped from the diversity dataset. It appears that more rows were dropped from the diversity dataset, but the dataset was just in a long format! After pivoting wider the merged dataset their appears to be the same number of rows in tuition as the merged dataset. The reason for joining by “name” and “state” is because some colleges have the same name but are in different states. Doing it this way ensures that each school has a unique identifier.
+The the regions data set was left joined to the combined set, this resulted in no cases being dropped as all 50 states are in the combined dataset. I think this joining was the best way to merge the datasets as we wanted to minimize the number of dropped rows and keep as many unique colleges in the dataframe.</p>
+</div>
+<div id="wrangling" class="section level3">
+<h3>Wrangling</h3>
+<p>Removed the variable room_and_board because a lot of colleges don’t have this variable! Used na.omit() to remove any rows with NAs</p>
+<pre class="r"><code>combined2 &lt;- combined %&gt;% select(-room_and_board) %&gt;% na.omit()
+combined2 %&gt;% glimpse(100)</code></pre>
+<pre><code>## Rows: 23,694
+## Columns: 14
+## $ name                 &lt;chr&gt; &quot;Aaniiih Nakoda College&quot;, &quot;Aaniiih Nakoda College&quot;, &quot;Aaniiih Nakoda …
+## $ state                &lt;chr&gt; &quot;Montana&quot;, &quot;Montana&quot;, &quot;Montana&quot;, &quot;Montana&quot;, &quot;Montana&quot;, &quot;Montana&quot;, &quot;M…
+## $ state_code           &lt;chr&gt; &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;MT&quot;, &quot;T…
+## $ type                 &lt;chr&gt; &quot;Public&quot;, &quot;Public&quot;, &quot;Public&quot;, &quot;Public&quot;, &quot;Public&quot;, &quot;Public&quot;, &quot;Public&quot;…
+## $ degree_length        &lt;chr&gt; &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;, &quot;2 Year&quot;…
+## $ in_state_tuition     &lt;int&gt; 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 34…
+## $ in_state_total       &lt;int&gt; 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 45…
+## $ out_of_state_tuition &lt;int&gt; 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 34…
+## $ out_of_state_total   &lt;int&gt; 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 2380, 45…
+## $ total_enrollment     &lt;int&gt; 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 291, 4427, 4427, 4…
+## $ category             &lt;chr&gt; &quot;Women&quot;, &quot;American Indian / Alaska Native&quot;, &quot;Asian&quot;, &quot;Black&quot;, &quot;Hispa…
+## $ enrollment           &lt;int&gt; 178, 256, 0, 0, 2, 0, 33, 0, 0, 0, 258, 2562, 18, 46, 387, 582, 0, 2…
+## $ Region               &lt;chr&gt; &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;West&quot;, &quot;Wes…
+## $ Division             &lt;chr&gt; &quot;Mountain&quot;, &quot;Mountain&quot;, &quot;Mountain&quot;, &quot;Mountain&quot;, &quot;Mountain&quot;, &quot;Mountai…</code></pre>
+<p><code>Select</code> function was used to remove an extra column that is was represented in the dataframe already. Any NAs were omitted to make analysis easier.</p>
+<p>The <code>diversity</code> dataframe gave us values that were absolute, we need the values relative to the university overall numbers. For example, if a university has a student population of 500 and there are 400 women, is different from a university of student population 10,000 and has 400 women. Which is why it is important to find the propotion of each category vs total enrollment.</p>
+<pre class="r"><code>combined_final_wide &lt;- combined2 %&gt;% pivot_wider(names_from = category, 
+    values_from = enrollment) %&gt;% mutate(Women = Women/total_enrollment, 
+    `American Indian / Alaska Native` = `American Indian / Alaska Native`/total_enrollment, 
+    Asian = Asian/total_enrollment, Black = Black/total_enrollment, 
+    Hispanic = Hispanic/total_enrollment, `Native Hawaiian / Pacific Islander` = `Native Hawaiian / Pacific Islander`/total_enrollment, 
+    White = White/total_enrollment, `Two Or More Races` = `Two Or More Races`/total_enrollment, 
+    Unknown = Unknown/total_enrollment, `Non-Resident Foreign` = `Non-Resident Foreign`/total_enrollment, 
+    `Total Minority` = `Total Minority`/total_enrollment)</code></pre>
+<p>After pivotting wider as in the previous section, the <code>mutate()</code> function was used to create new columns that are now more accurate to use. We divided columns such as Women, Black, and White by the total enrollment at that university.</p>
+<p>Ran a summary statistic for the entire dataset!</p>
+<pre class="r"><code>combined_final_wide %&gt;% filter(degree_length == &quot;2 Year&quot;) %&gt;% 
+    summarize_if(is.numeric, median) %&gt;% glimpse(100)</code></pre>
+<pre><code>## Rows: 1
+## Columns: 16
+## $ in_state_tuition                     &lt;dbl&gt; 4230
+## $ in_state_total                       &lt;dbl&gt; 4808.5
+## $ out_of_state_tuition                 &lt;dbl&gt; 8950
+## $ out_of_state_total                   &lt;dbl&gt; 10008
+## $ total_enrollment                     &lt;dbl&gt; 4345.5
+## $ Women                                &lt;dbl&gt; 0.5835504
+## $ `American Indian / Alaska Native`    &lt;dbl&gt; 0.004595825
+## $ Asian                                &lt;dbl&gt; 0.01494745
+## $ Black                                &lt;dbl&gt; 0.07893
+## $ Hispanic                             &lt;dbl&gt; 0.07268423
+## $ `Native Hawaiian / Pacific Islander` &lt;dbl&gt; 0.001293634
+## $ White                                &lt;dbl&gt; 0.6087535
+## $ `Two Or More Races`                  &lt;dbl&gt; 0.0212413
+## $ Unknown                              &lt;dbl&gt; 0.02270579
+## $ `Non-Resident Foreign`               &lt;dbl&gt; 0.00311511
+## $ `Total Minority`                     &lt;dbl&gt; 0.3352371</code></pre>
+<p>The summarize function was used by itself on the data. After filtering the dataframe for only two year colleges, which consists of technical and community colleges, the median value was calculated for every column.</p>
+<p>It appears that median in state tuition is around $4230 dollars, while out of state tuition is nearly double that, at around $8,950. It appears that median composition of women in the student population is almost at 60%. There are appears to be slightly more women going for degrees at their community colleges than men. This could be due to the fact that historically women have been the stay at home moms and now would like to further their education at their local community college. This is happening at my own home!</p>
+<p>For every state we filtered for their 4 year colleges and found the average for all their numeric variables. Then we arranged from highest to lowest out of state total cost.</p>
+<pre class="r"><code>combined_final_wide %&gt;% filter(degree_length == &quot;4 Year&quot;) %&gt;% 
+    group_by(state) %&gt;% summarize_if(is.numeric, mean) %&gt;% arrange(desc(out_of_state_total)) %&gt;% 
+    select(-c(in_state_total, `Total Minority`, `Non-Resident Foreign`, 
+        Unknown, `Two Or More Races`, `Native Hawaiian / Pacific Islander`, 
+        `American Indian / Alaska Native`, out_of_state_tuition)) %&gt;% 
+    head(20)</code></pre>
+<pre><code>## # A tibble: 20 x 9
+##    state in_state_tuition out_of_state_to… total_enrollment Women  Asian  Black
+##    &lt;chr&gt;            &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Rhod…           36562            53917.            6154. 0.544 0.0491 0.0422
+##  2 Mass…           37016.           52592.            4606. 0.592 0.0565 0.0710
+##  3 Verm…           33384            49480.            2587. 0.521 0.0209 0.0342
+##  4 Wash…           29785.           46276.            8541  0.564 0.0681 0.0281
+##  5 Oreg…           28204.           45551             6438  0.579 0.0521 0.0217
+##  6 New …           33069.           44761.            4200. 0.473 0.0423 0.0681
+##  7 Penn…           32047.           44715.            4283. 0.590 0.0299 0.104 
+##  8 Conn…           29577.           44676.            6567. 0.580 0.0349 0.109 
+##  9 New …           28200.           42791.            6629. 0.592 0.0233 0.0381
+## 10 Mary…           25879.           42671.            6251. 0.598 0.0388 0.266 
+## 11 Indi…           29761.           41926.            4813. 0.520 0.0193 0.118 
+## 12 Virg…           24446            41530.            8499. 0.573 0.0321 0.211 
+## 13 Cali…           31402.           41348.            5053. 0.541 0.114  0.0617
+## 14 Maine           25546.           41211.            3108. 0.599 0.0223 0.0271
+## 15 Colo…           23982.           40899.            5607. 0.532 0.0219 0.0349
+## 16 Wisc…           31394.           40655.            2939. 0.641 0.0271 0.0608
+## 17 Iowa            28878.           39362.            4168. 0.567 0.0283 0.0441
+## 18 New …           24854.           39038.            7077. 0.472 0.0522 0.128 
+## 19 Illi…           28277.           38636.            6183  0.607 0.0506 0.120 
+## 20 Hawa…           19691.           37290             4169  0.609 0.209  0.0420
+## # … with 2 more variables: Hispanic &lt;dbl&gt;, White &lt;dbl&gt;</code></pre>
+<p>The mean summary statistics were done for states and their various variables. First we used the <code>filter()</code> function to only have institutions with 4 year degree lengths in the dataframe. We then used <code>group_by</code> to group by states before using the <code>summarize_if()</code> function to apply the mean summary statistic to the numeric columns in the dataset. Finally, using <code>arrange()</code> to arrange the rows in an ascending fashion using the out of state total mean.</p>
+<p>After grouping by state it appears that Rhode Island and Massachusetts have the highest out of state total cost! We had hypothesized earlier that colleges in the East coast would be more expensive due to their location. Aside from Pennsylvania, the top 10 states with highest average out of state total are all physically touching a body of water! Could it be that if a state has access to beach water that is what makes it expensive? Or could it be that states with more private colleges are what results in increased tuition?</p>
+<p>We did summary statistics for each of the region’s variables.</p>
+<pre class="r"><code>combined_final_wide %&gt;% filter(degree_length == &quot;4 Year&quot;) %&gt;% 
+    group_by(Region) %&gt;% summarize_if(is.numeric, funs(median, 
+    mean, sd, min, max)) %&gt;% as.data.frame() %&gt;% arrange(out_of_state_tuition_median) %&gt;% 
+    head()</code></pre>
+<pre><code>##   Region in_state_tuition_median in_state_total_median
+## 1  South                   15563                 24437
+##   out_of_state_tuition_median out_of_state_total_median total_enrollment_median
+## 1                     22832.5                   32009.5                    2759
+##   Women_median American Indian / Alaska Native_median Asian_median Black_median
+## 1    0.5796636                            0.003369663   0.01429967    0.1363774
+##   Hispanic_median Native Hawaiian / Pacific Islander_median White_median
+## 1      0.04177287                              0.0008498936    0.6037964
+##   Two Or More Races_median Unknown_median Non-Resident Foreign_median
+## 1               0.02158636     0.02221841                  0.02473307
+##   Total Minority_median in_state_tuition_mean in_state_total_mean
+## 1             0.3022176              19845.93            28964.75
+##   out_of_state_tuition_mean out_of_state_total_mean total_enrollment_mean
+## 1                   24596.1                33714.92              6746.048
+##   Women_mean American Indian / Alaska Native_mean Asian_mean Black_mean
+## 1  0.5684503                          0.007573542 0.02501158    0.25528
+##   Hispanic_mean Native Hawaiian / Pacific Islander_mean White_mean
+## 1     0.0766952                             0.001287659  0.5302577
+##   Two Or More Races_mean Unknown_mean Non-Resident Foreign_mean
+## 1             0.02213554   0.04130982                0.04044902
+##   Total Minority_mean in_state_tuition_sd in_state_total_sd
+## 1           0.3879835             12787.8           14727.4
+##   out_of_state_tuition_sd out_of_state_total_sd total_enrollment_sd  Women_sd
+## 1                10581.04              12894.69            9874.303 0.1258458
+##   American Indian / Alaska Native_sd   Asian_sd  Black_sd Hispanic_sd
+## 1                          0.0195984 0.03173999 0.2794492   0.1074147
+##   Native Hawaiian / Pacific Islander_sd White_sd Two Or More Races_sd
+## 1                            0.00210533 0.257724           0.01917369
+##   Unknown_sd Non-Resident Foreign_sd Total Minority_sd in_state_tuition_min
+## 1 0.05602296              0.05458532         0.2613788                 3194
+##   in_state_total_min out_of_state_tuition_min out_of_state_total_min
+## 1               5390                     5390                   5390
+##   total_enrollment_min Women_min American Indian / Alaska Native_min Asian_min
+## 1                   24         0                                   0         0
+##   Black_min Hispanic_min Native Hawaiian / Pacific Islander_min White_min
+## 1         0            0                                      0         0
+##   Two Or More Races_min Unknown_min Non-Resident Foreign_min Total Minority_min
+## 1                     0           0                        0                  0
+##   in_state_tuition_max in_state_total_max out_of_state_tuition_max
+## 1                55695              71338                    55695
+##   out_of_state_total_max total_enrollment_max Women_max
+## 1                  71338                81459         1
+##   American Indian / Alaska Native_max Asian_max Black_max Hispanic_max
+## 1                            0.211071 0.1993938         1    0.9298385
+##   Native Hawaiian / Pacific Islander_max White_max Two Or More Races_max
+## 1                                   0.02         1             0.1759305
+##   Unknown_max Non-Resident Foreign_max Total Minority_max
+## 1   0.3987517                0.6356859                  1
+##  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 3 rows ]</code></pre>
+<p>Summary statistics were done for regions and their various variables. First we used the <code>filter()</code> function to only have institutions with 4 year degree lengths in the dataframe. We then used <code>group_by</code> to group by region before using the <code>summarize_if()</code> function to apply summary statistics such as <code>sd</code>,<code>mean</code>,<code>median</code>,<code>min</code>,<code>max</code> to all the numeric columns in the dataset. Finally, using <code>arrange()</code> to arrange the rows in an ascending fashion using the out of state tuition median.</p>
+<p>Using the out of state median tuition to arrange, it appears that the South region has the lower out of state tuition. Earlier I hypothesized that both the East and the West Coast regions would have higher tuition and it appears that the East and West coast out of state tuitions are higher than the other regions. It also appears that colleges with a higher hispanic student population appear to be in the West. This could be due to states like California’s large Hispanic population! The median for the propotion of women in the student population appears to be around 0.56 and 0.57 for all four regions. I would’ve expected that there be more colleges where men are compose most of the student body;however, this is false.</p>
+</div>
+<div id="visualizing" class="section level3">
+<h3>Visualizing</h3>
+<p>A correlation heatmap of the numeric variables.</p>
+<pre class="r"><code>cormat &lt;- combined_final_wide %&gt;% select_if(is.numeric) %&gt;% cor(use = &quot;pair&quot;)
+
+tidycor &lt;- cormat %&gt;% as.data.frame %&gt;% rownames_to_column(&quot;var1&quot;) %&gt;% 
+    pivot_longer(-1, names_to = &quot;var2&quot;, values_to = &quot;correlation&quot;)
+
+tidycor</code></pre>
+<pre><code>## # A tibble: 256 x 3
+##    var1             var2                            correlation
+##    &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+##  1 in_state_tuition in_state_tuition                     1     
+##  2 in_state_tuition in_state_total                       0.982 
+##  3 in_state_tuition out_of_state_tuition                 0.945 
+##  4 in_state_tuition out_of_state_total                   0.929 
+##  5 in_state_tuition total_enrollment                    -0.173 
+##  6 in_state_tuition Women                                0.0194
+##  7 in_state_tuition American Indian / Alaska Native     -0.128 
+##  8 in_state_tuition Asian                                0.161 
+##  9 in_state_tuition Black                               -0.159 
+## 10 in_state_tuition Hispanic                            -0.180 
+## # … with 246 more rows</code></pre>
+<pre class="r"><code>tidycor %&gt;% ggplot(aes(var1, var2, fill = correlation)) + geom_tile() + 
+    scale_fill_gradient2(low = &quot;red&quot;, mid = &quot;white&quot;, high = &quot;blue&quot;, 
+        name = &quot;Correlation&quot;) + theme(axis.text.x = element_text(angle = 90, 
+    hjust = 1)) + coord_fixed() + ggtitle(&quot;Correlation Heatmap of \nNumeric Variables&quot;) + 
+    scale_x_discrete(name = &quot;Variables&quot;) + scale_y_discrete(name = &quot;Variables&quot;)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" />
+A correlation heatmap was run using all the numeric variables in the dataset. It appears that there are clumps with very high positive relationship, but that is due to the fact that these four variables are all very closely related. Higher out state tuition and total out of state total would almost perfectly correlate as total out of state would include out of state tuition and like wise with in state fees. There is an inverse relationship between people of the race white and minorities as the two change when one goes up. On the other hand, there appears to be a weak negative relationship between Blacks, Hispanics and out of state total. As we said before this could be due to these groups being at a disadvantage compared to their white peers in terms of paying for their education.</p>
+<p>ggplot depicting the relationship between Out of state tuition and proportion of minority within the student population for all colleges.</p>
+<pre class="r"><code>ggplot_data &lt;- combined_final_wide %&gt;% select(out_of_state_tuition, 
+    Women, total_enrollment, Region, name, `Total Minority`)
+
+ggplot_data %&gt;% ggplot(aes(y = `Total Minority`, x = out_of_state_tuition)) + 
+    geom_point(color = &quot;dark green&quot;) + geom_smooth(method = &quot;lm&quot;, 
+    formula = y ~ x, linetype = &quot;dashed&quot;, color = &quot;dark blue&quot;) + 
+    facet_wrap(~Region, scales = &quot;free&quot;) + scale_y_continuous(name = &quot; Proportion of Student Population that is a Minority&quot;) + 
+    scale_x_continuous(name = &quot;Out of State Tuition ($)&quot;) + ggtitle(&quot;Out of State Tuition versus Proportion of \n Student Population that is a Minority per Region &quot;) + 
+    theme(panel.grid = element_blank(), axis.line = element_line(color = &quot;#FF7E42&quot;), 
+        axis.ticks = element_line(color = &quot;#FF7E42&quot;), plot.background = element_rect(fill = &quot;sky blue&quot;, 
+            color = &quot;white&quot;, size = 2), legend.key = element_blank(), 
+        legend.background = element_blank(), strip.background = element_blank())</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" />
+From this faceted scatter plot with a lines of best fit help us explore the relationship between out of state tuition and percent of the student body that identifies as a minority.
+For all four regions, there appears to be a weak negative relationship between the two variables. As out of state tuition increases, colleges have a lower percentage of its student body as a minority. However, there appears to be much a much stronger negative relationship in the Western and Southern Region. These correlations are very weak and could be due to other factors. For every region there are numerous colleges that have low tuition but high and low proportions of minorities.Perhaps, tuition price at the lower ends doesn’t affect the minority percentage but only at the higher end.</p>
+<p>ggplot depicting the relationship between in state tuition and proportion of minority within the student population.</p>
+<pre class="r"><code>ggplot(combined_final_wide %&gt;% filter(degree_length == &quot;4 Year&quot;), 
+    aes(x = reorder(state, -in_state_tuition))) + geom_bar(aes(y = in_state_tuition, 
+    fill = Region), stat = &quot;summary&quot;, fun = mean, width = 0.5, 
+    position = position_dodge(0.8)) + theme(axis.text.x = element_text(angle = 90, 
+    hjust = 1), panel.background = element_rect(fill = &quot;white&quot;, 
+    colour = &quot;grey50&quot;), legend.justification = c(&quot;right&quot;, &quot;top&quot;), 
+    legend.position = c(0.97, 0.95)) + scale_x_discrete(name = &quot; States&quot;) + 
+    ggtitle(&quot;Mean In State Tuition per State Grouped by Region &quot;) + 
+    scale_y_continuous(breaks = seq(from = 0, to = 40000, by = 5000), 
+        name = &quot;In State Tuition ($)&quot;)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
+This bar chart depicts the average in state tuition per state for 4 year institutions, with the regions color coded. As we saw earlier in the summary statistics, the top 5 states with the most expensive in state tuition come from the Northeast region. This is due to the fact that many elite universities, such as MIT, Harvard, Yale, Princeton, Boston college are private and are located there. The top 4 states with cheapest tuition come from states that are landlocked such as Wyoming, Utah, New Mexico and North Dakota. Perhaps further analysis should be done to see whether the number of private schools in a state or the average ranking of all the colleges in a state contribute to the increased in state tuition.</p>
+</div>
+<div id="dimensionality-reduction-through-pca" class="section level3">
+<h3>Dimensionality Reduction Through PCA</h3>
+<div id="preparing-the-data" class="section level4">
+<h4>Preparing the data</h4>
+<pre class="r"><code>poke_nums &lt;- combined_final_wide %&gt;% select_if(is.numeric) %&gt;% 
+    scale
+
+rownames(poke_nums) &lt;- combined_final_wide$name</code></pre>
+<p>Selected all the numeric columns that will be used for the PCA and then normalized the data by using the <code>scale()</code> function! Added the college names as row names so we could later identify the rows.</p>
+</div>
+<div id="performing-pca" class="section level4">
+<h4>Performing PCA</h4>
+<pre class="r"><code>poke_pca &lt;- princomp(poke_nums)
+
+names(poke_pca)</code></pre>
+<pre><code>## [1] &quot;sdev&quot;     &quot;loadings&quot; &quot;center&quot;   &quot;scale&quot;    &quot;n.obs&quot;    &quot;scores&quot;   &quot;call&quot;</code></pre>
+<p>Performed PCA by running the prepared variables through <code>princomp()</code>.</p>
+</div>
+<div id="choosing-number-of-principal-components-to-keep-by-running-a-scree-plot" class="section level4">
+<h4>Choosing number of principal Components to keep by running a “scree plot”</h4>
+<pre class="r"><code>eigval &lt;- poke_pca$sdev^2
+varprop = round(eigval/sum(eigval), 2)
+
+ggplot() + geom_bar(aes(y = varprop, x = 1:16), stat = &quot;identity&quot;) + 
+    xlab(&quot;&quot;) + geom_path(aes(y = varprop, x = 1:16)) + geom_text(aes(x = 1:16, 
+    y = varprop, label = round(varprop, 2)), vjust = 1, col = &quot;white&quot;, 
+    size = 5) + scale_y_continuous(breaks = seq(0, 0.6, 0.2), 
+    labels = scales::percent) + scale_x_continuous(breaks = 1:10)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" />
+After running a scree plot, that shows the variance explained by each PC, it appears that it takes 7 PCs for the cumulative proportion of the variances to be greater than 80%. It appears that not one PC can strongly explain the data’s variance.</p>
+</div>
+<div id="interpreting-pcs" class="section level4">
+<h4>Interpreting PCs:</h4>
+<pre class="r"><code>summary(poke_pca, loadings = T)</code></pre>
+<pre><code>## Importance of components:
+##                           Comp.1    Comp.2    Comp.3     Comp.4     Comp.5
+## Standard deviation     2.1156815 1.6484115 1.3211493 1.07493622 1.04728815
+## Proportion of Variance 0.2798867 0.1699077 0.1091404 0.07225154 0.06858262
+## Cumulative Proportion  0.2798867 0.4497944 0.5589348 0.63118630 0.69976891
+##                            Comp.6     Comp.7     Comp.8     Comp.9    Comp.10
+## Standard deviation     1.01929245 0.99289403 0.90249620 0.84705060 0.78507098
+## Proportion of Variance 0.06496498 0.06164353 0.05092986 0.04486425 0.03853892
+## Cumulative Proportion  0.76473389 0.82637742 0.87730728 0.92217152 0.96071044
+##                           Comp.11     Comp.12     Comp.13      Comp.14 Comp.15
+## Standard deviation     0.72922335 0.253029167 0.180417815 5.569093e-08       0
+## Proportion of Variance 0.03325086 0.004003344 0.002035357 1.939325e-16       0
+## Cumulative Proportion  0.99396130 0.997964643 1.000000000 1.000000e+00       1
+##                        Comp.16
+## Standard deviation           0
+## Proportion of Variance       0
+## Cumulative Proportion        1
+## 
+## Loadings:
+##                                    Comp.1 Comp.2 Comp.3 Comp.4 Comp.5 Comp.6
+## in_state_tuition                    0.444         0.144                     
+## in_state_total                      0.449         0.143                     
+## out_of_state_tuition                0.449  0.118                            
+## out_of_state_total                  0.448  0.113                            
+## total_enrollment                           0.177 -0.342 -0.380 -0.170       
+## Women                                             0.188  0.379 -0.444  0.325
+##                                    Comp.7 Comp.8 Comp.9 Comp.10 Comp.11 Comp.12
+## in_state_tuition                           0.142                         0.637 
+## in_state_total                             0.109                         0.329 
+## out_of_state_tuition                              0.119                 -0.441 
+## out_of_state_total                                0.158                 -0.516 
+## total_enrollment                    0.328 -0.380  0.529  0.338           0.155 
+## Women                               0.494 -0.248 -0.406  0.156  -0.139         
+##                                    Comp.13 Comp.14 Comp.15 Comp.16
+## in_state_tuition                    0.362   0.455                 
+## in_state_total                     -0.544  -0.582                 
+## out_of_state_tuition                0.622  -0.404                 
+## out_of_state_total                 -0.429   0.536                 
+## total_enrollment                                                  
+## Women                                                             
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 10 rows ]</code></pre>
+<p>Could see the different variables in the PCA by running <code>summary()</code> function on the PCA object. Here we can view Loadings, which contain the principal components and the variance each PC explains.
+Looking at the Loadings, it appears that PC1 explains the relationship relationship between tuition rates and costs, both in and out of state with the proportion of minority at the institution. It is consistent with the previous findings that the higher the cost of a college the lower the percentage of minorities will make up the student population. PC2 appears to explain how increasing proportion of a white student population will result in lower proportions of minorities, which is expected!PC3 appears to show how large colleges, indicated by large total enrollment, have lower proportion of Black students. It appears that these relationships are not as strong due to the low variance explained by each PC.</p>
+</div>
+<div id="visualize-scores." class="section level4">
+<h4>Visualize scores.</h4>
+<p>Plot of Loadings</p>
+<pre class="r"><code>poke_pca$loadings[1:16, 1:2] %&gt;% as.data.frame %&gt;% rownames_to_column %&gt;% 
+    ggplot() + geom_hline(aes(yintercept = 0), lty = 2) + geom_vline(aes(xintercept = 0), 
+    lty = 2) + ylab(&quot;PC2&quot;) + xlab(&quot;PC1&quot;) + geom_segment(aes(x = 0, 
+    y = 0, xend = Comp.1, yend = Comp.2), arrow = arrow(), col = &quot;red&quot;) + 
+    geom_label(aes(x = Comp.1 * 1.1, y = Comp.2 * 1.1, label = rowname))</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" />
+Angles between vectors show correlation between the various variables. This ggplot of the various Variables allows us to visually see how the different variables interact with one another on PC1 and PC2.</p>
+<p>Plotting Data with respect to the first 3 PCs.</p>
+<pre class="r"><code>pokedf &lt;- data.frame(Name = combined_final_wide$name, PC1 = poke_pca$scores[, 
+    1], PC2 = poke_pca$scores[, 2], PC3 = poke_pca$scores[, 3])
+
+ggplot(pokedf, aes(PC1, PC2, color = combined_final_wide$type)) + 
+    geom_point() + scale_color_discrete(name = &quot;College Type&quot;)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(pokedf, aes(PC2, PC3, color = combined_final_wide$total_enrollment)) + 
+    geom_point() + scale_color_gradient2(low = &quot;red&quot;, mid = &quot;white&quot;, 
+    high = &quot;blue&quot;, name = &quot;College Size&quot;)</code></pre>
+<p><img src="../../project/project1_files/figure-html/unnamed-chunk-20-2.png" width="672" style="display: block; margin: auto;" />
+A ggplot was done to visualize the first three PCS against each other with the various variables mapped to them so groupings can be identified. In the first plot, it is evident that PC1 strongly separates the private and public colleges, which are explained by the relationship between minority and high tuition rates. In the second plot, PC3 dependence on College size (which comes from total enrollment), can be seen by the gradient. Low college populations are the very white points and although there are not that many very dark points,indicative of a large student population, the distinct grouping can be seen.</p>
+<pre class="r"><code>## paste this chunk into the ```{r setup} chunk at the top of
+## your project 1 .Rmd file
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = &quot;center&quot;, 
+    warning = F, message = F, tidy = TRUE, tidy.opts = list(width.cutoff = 60), 
+    R.options = list(max.print = 100))</code></pre>
+<p>…</p>
+</div>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

@@ -1,0 +1,272 @@
+---
+title: 'Project 1: Exploratory Data Analysis'
+author: "SDS348"
+date: 'Febuary 17th 2021'
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+
+<P style="page-break-before: always">
+\newpage
+
+
+### Introduction
+
+  Dataset 1 is and dataset 2 both come from the US Department of Education. Dataset 1 contains data that pertains to US college diversity such as the proportion of each race and gender relative to the entire student population. On the other hand, Dataset 2 contains data that pertains to these college's tuition and overall cost. Both were easily obtained from the tidytuesday GitHub. Dataset 3 came from the US Census Bureau and it contains classifications regarding what region a state belongs too. It is mainly going to be used to group the different colleges into their respective regions. This dataset was also acquired from the agency's GitHub repository. 
+
+  These data sets are interesting to me because I have a brother who will be applying to colleges soon, and looking at these metrics could possibly help narrow down his college list. Additionally, with student debt increasing this could help others find cheaper upper education. I expect that colleges in the coasts will be more expensive that colleges that are in land. I believe this could be due to premium location. It is known that cost of living in states like California and New York are sky high and this could be likewise for colleges. Additionally, I believe that colleges with less diversity will be more expensive as minority groups that have historically been oppressed will find it hard to pay for colleges that have a high sticker price.
+
+#### Data Download & Libraries
+
+Need to download the Library that will be used for the majority of this project.
+```{r}
+library(tidyverse)
+```
+
+Loading all the datasets.
+```{r}
+
+diversity <- read.csv("diversity.csv") %>% select(-1) %>% mutate_if(is.factor, as.character)
+tuition <- read.csv("tuition.csv") %>% select(-1) %>% mutate_if(is.factor, as.character)
+regions <- read.csv("us census bureau regions and divisions.csv") %>% mutate_if(is.factor, as.character)
+```
+Removed columns that were of no meaning to us. And made sure that the variables where in a usable data type by converting some columns to a character type.
+
+Here is an initial view of the data after getting them and before anything is done to them.
+```{r}
+diversity %>% glimpse()
+tuition %>% glimpse()
+regions %>% glimpse()
+```
+
+
+### Tidying: Rearranging Wide/Long 
+
+diversity, regions and tuition dataset are all tidy and clean.Here is a demonstration of using `pivot_wider()` and `pivot_longer()` using the diversity dataset. 
+```{r}
+dirty <- diversity %>% pivot_wider(names_from = category, values_from = enrollment) %>% glimpse(100)
+```
+The diversity dataset was originally in a long format. Using pivot wider, we took the names for the new columns from the category column and the corresponding values from the enrollment column. Now we created a column for categories such as race and gender.
+
+
+Now that the data is in wide form, we will use `pivtot_longer()` to turn the dataset back into long form. 
+```{r}
+cleaned <- pivot_longer(data = dirty ,cols = -c(1:4),names_to = "category", values_to = "enrollment" ) %>% glimpse(100)
+```
+We selected all the data columns that we want to collect together and put them under the column "category" and their corresponding values in the column "enrollment". Now our data is in a long format.
+    
+### Joining/Merging
+
+Here is where joining of all three datasets takes places.
+```{r}
+combined <- left_join(tuition, diversity, by = c("name", "state")) %>% left_join(regions, by =c("state" = "State")) %>% select(-State.Code)
+
+combined %>% pivot_wider(names_from = category, values_from = enrollment) %>% head()
+combined %>% glimpse(100)
+```
+`left_join` is used with the tuition dataset being the dataset on the left because we want to keep all the rows from tuition and add rows with matches from diverstiy. The reason for this is because tuition dataset has less rows(less colleges) than the diversity dataset. Doing it like this minimizes the number of NAs in the combined dataset. No rows were dropped from the tuition dataset;however, the diversity dataset had 4046 different colleges while tuition dataset had 2973 unique colleges. This resulted in 1073 unique colleges being dropped from the diversity dataset. It appears that more rows were dropped from the diversity dataset, but the dataset was just in a long format! After pivoting wider the merged dataset their appears to be the same number of rows in tuition as the merged dataset. The reason for joining by "name" and "state" is because some colleges have the same name but are in different states. Doing it this way ensures that each school has a unique identifier.
+The the regions data set was left joined to the combined set, this resulted in no cases being dropped as all 50 states are in the combined dataset. I think this joining was the best way to merge the datasets as we wanted to minimize the number of dropped rows and keep as many unique colleges in the dataframe.
+
+
+### Wrangling 
+    
+Removed the variable room_and_board because a lot of colleges don't have this variable! Used na.omit() to remove any rows with NAs
+```{r}
+combined2 <- combined %>% select(-room_and_board) %>% na.omit()
+combined2%>% glimpse(100)
+```
+`Select` function was used to remove an extra column that is was represented in the dataframe already. Any NAs were omitted to make analysis easier.
+
+
+The `diversity` dataframe gave us values that were absolute, we need the values relative to the university overall numbers. For example, if a university has a student population of 500 and there are 400 women, is different from a university of student population 10,000 and has 400 women. Which is why it is important to find the propotion of each category vs total enrollment.
+```{r}
+combined_final_wide <- combined2 %>%
+  pivot_wider(names_from = category, values_from = enrollment) %>%
+  mutate(Women = Women/total_enrollment,`American Indian / Alaska Native` = `American Indian / Alaska Native` /total_enrollment,Asian = Asian/total_enrollment,Black  = Black /total_enrollment,Hispanic  = Hispanic /total_enrollment,`Native Hawaiian / Pacific Islander`  = `Native Hawaiian / Pacific Islander` /total_enrollment,White   = White  /total_enrollment,`Two Or More Races`  = `Two Or More Races` /total_enrollment,Unknown  = Unknown /total_enrollment,`Non-Resident Foreign`   = `Non-Resident Foreign`  /total_enrollment,`Total Minority`   = `Total Minority`  /total_enrollment)
+
+
+
+```
+After pivotting wider as in the previous section, the `mutate()` function was used to create new columns that are now more accurate to use. We divided columns such as Women, Black, and White by the total enrollment at that university.
+
+Ran a summary statistic for the entire dataset!
+```{r}
+combined_final_wide %>%
+  filter(degree_length == "2 Year") %>% summarize_if(is.numeric,median) %>% glimpse(100)
+```
+The summarize function was used by itself on the data. After filtering the dataframe for only two year colleges, which consists of technical and community colleges, the median value was calculated for every column.
+
+It appears that median in state tuition is around \$4230 dollars, while out of state tuition is nearly double that, at around \$8,950. It appears that median composition of women in the student population is almost at 60%. There are appears to be slightly more women going for degrees at their community colleges than men. This could be due to the fact that historically women have been the stay at home moms and now would like to further their education at their local community college. This is happening at my own home!
+
+
+For every state we filtered for their 4 year colleges and found the average for all their numeric variables. Then we arranged from highest to lowest out of state total cost. 
+```{r}
+combined_final_wide %>%
+  filter(degree_length == "4 Year") %>% 
+  group_by(state) %>% summarize_if(is.numeric,mean) %>% 
+  arrange(desc(out_of_state_total)) %>% select(-c(`in_state_total`,`Total Minority`,`Non-Resident Foreign`,`Unknown`,`Two Or More Races`,`Native Hawaiian / Pacific Islander`,`American Indian / Alaska Native`,out_of_state_tuition
+)) %>% head(20)
+```
+The mean summary statistics were done for states and their various variables. First we used the `filter()` function to only have institutions with 4 year degree lengths in the dataframe. We then used `group_by` to group by states before using the `summarize_if()` function to apply the mean summary statistic to the numeric columns in the dataset. Finally, using `arrange()` to arrange the rows in an ascending fashion using the out of state total mean.
+
+After grouping by state it appears that Rhode Island and Massachusetts have the highest out of state total cost! We had hypothesized earlier that colleges in the East coast would be more expensive due to their location. Aside from Pennsylvania, the top 10 states with highest average out of state total are all physically touching a body of water! Could it be that if a state has access to beach water that is what makes it expensive? Or could it be that states with more private colleges are what results in increased tuition?
+
+
+
+We did summary statistics for each of the region's variables.
+```{r}
+combined_final_wide %>% 
+  filter(degree_length == "4 Year") %>%
+  group_by(Region)%>% 
+  summarize_if(is.numeric,funs(median,mean,sd,min,max)) %>% as.data.frame() %>% arrange(out_of_state_tuition_median) %>% head()
+```
+  Summary statistics were done for regions and their various variables. First we used the `filter()` function to only have institutions with 4 year degree lengths in the dataframe. We then used `group_by` to group by region before using the `summarize_if()` function to apply summary statistics such as `sd`,`mean`,`median`,`min`,`max` to all the numeric columns in the dataset. Finally, using `arrange()` to arrange the rows in an ascending fashion using the out of state tuition median.
+
+Using the out of state median tuition to arrange, it appears that the South region has the lower out of state tuition. Earlier I hypothesized that both the East and the West Coast regions would have higher tuition and it appears that the East and West coast out of state tuitions are higher than the other regions. It also appears that colleges with a higher hispanic student population appear to be in the West. This could be due to states like California's large Hispanic population! The median for the propotion of women in the student population appears to be around 0.56 and 0.57 for all four regions. I would've expected that there be more colleges where men are compose most of the student body;however, this is false.
+
+
+
+### Visualizing
+
+A correlation heatmap of the numeric variables.
+```{r}
+cormat <- combined_final_wide %>% select_if(is.numeric) %>% cor(use="pair")
+
+tidycor <- cormat%>% as.data.frame %>% rownames_to_column("var1") %>%
+pivot_longer(-1,names_to="var2",values_to="correlation")
+
+tidycor
+
+tidycor%>%ggplot(aes(var1,var2,fill=correlation))+
+geom_tile()+
+scale_fill_gradient2(low="red",mid="white",high="blue",name = "Correlation")+ 
+theme(axis.text.x = element_text(angle = 90, hjust=1))+ 
+coord_fixed()  +ggtitle("Correlation Heatmap of \nNumeric Variables") + scale_x_discrete(name = "Variables") +
+  scale_y_discrete(name = "Variables")
+```
+A correlation heatmap was run using all the numeric variables in the dataset. It appears that there are clumps with very high positive relationship, but that is due to the fact that these four variables are all very closely related. Higher out state tuition and total out of state total would almost perfectly correlate as total out of state would include out of state tuition and like wise with in state fees. There is an inverse relationship between people of the race white and minorities as the two change when one goes up. On the other hand, there appears to be a weak negative relationship between Blacks, Hispanics and out of state total. As we said before this could be due to these groups being at a disadvantage compared to their white peers in terms of paying for their education. 
+
+
+  
+ggplot depicting the relationship between Out of state tuition and proportion of minority within the student population for all colleges.
+```{r}
+ggplot_data <- combined_final_wide %>%  select(out_of_state_tuition,Women,total_enrollment,Region,name,`Total Minority`)
+
+ggplot_data %>% ggplot(aes(y= `Total Minority`,x = out_of_state_tuition)) + geom_point(color = "dark green") + geom_smooth(method='lm', formula= y~x,linetype="dashed",color = "dark blue") + facet_wrap(~ Region, scales="free") + scale_y_continuous(name = " Proportion of Student Population that is a Minority") + scale_x_continuous(name = "Out of State Tuition ($)") + ggtitle("Out of State Tuition versus Proportion of \n Student Population that is a Minority per Region ") + theme(panel.grid = element_blank(),
+           axis.line = element_line(color = "#FF7E42"),
+           axis.ticks = element_line(color = "#FF7E42"),
+           plot.background = element_rect(fill = "sky blue",color = "white", size = 2),
+           legend.key = element_blank(),
+           legend.background=element_blank(),
+           strip.background = element_blank())
+```
+From this faceted scatter plot with a lines of best fit help us explore the relationship between out of state tuition and percent of the student body that identifies as a minority. 
+For all four regions, there appears to be a weak negative relationship between the two variables. As out of state tuition increases, colleges have a lower percentage of its student body as a minority. However, there appears to be much a much stronger negative relationship in the Western and Southern Region. These correlations are very weak and could be due to other factors. For every region there are numerous colleges that have low tuition but high and low proportions of minorities.Perhaps, tuition price at the lower ends doesn't affect the minority percentage but only at the higher end.
+
+
+ggplot depicting the relationship between in state tuition and proportion of minority within the student population.
+```{r}
+ggplot(combined_final_wide %>%filter(degree_length == "4 Year"), aes(x = reorder(state,- in_state_tuition))) +
+geom_bar(aes(y= in_state_tuition,fill = Region), stat="summary", fun=mean,width = 0.5, position = position_dodge(0.8)) + theme(axis.text.x = element_text(angle=90, hjust=1),panel.background = element_rect(fill = "white", colour = "grey50"),legend.justification = c("right", "top"),legend.position = c(.97, .95)) +scale_x_discrete(name = " States") + ggtitle("Mean In State Tuition per State Grouped by Region ") + scale_y_continuous(breaks = seq(from = 0, to = 40000, by = 5000),name = "In State Tuition ($)")
+
+```
+This bar chart depicts the average in state tuition per state for 4 year institutions, with the regions color coded. As we saw earlier in the summary statistics, the top 5 states with the most expensive in state tuition come from the Northeast region. This is due to the fact that many elite universities, such as MIT, Harvard, Yale, Princeton, Boston college are private and are located there. The top 4 states with cheapest tuition come from states that are landlocked such as Wyoming, Utah, New Mexico and North Dakota. Perhaps further analysis should be done to see whether the number of private schools in a state or the average ranking of all the colleges in a state contribute to the increased  in state tuition.
+
+
+### Dimensionality Reduction Through PCA
+
+#### Preparing the data
+```{r}
+poke_nums<-combined_final_wide %>% select_if(is.numeric) %>% scale
+
+rownames(poke_nums)<-combined_final_wide$name
+
+```
+Selected all the numeric columns that will be used for the PCA and then normalized the data by using the `scale()` function! Added the college names as row names so we could later identify the rows.
+
+#### Performing PCA
+```{r}
+
+poke_pca<-princomp(poke_nums)
+
+names(poke_pca)
+```
+Performed PCA by running the prepared variables through `princomp()`.
+
+#### Choosing number of principal Components to keep by running a "scree plot"
+```{r}
+eigval<-poke_pca$sdev^2
+varprop=round(eigval/sum(eigval), 2)
+
+ggplot() +
+  geom_bar(aes(y=varprop, x=1:16), stat="identity") + 
+  xlab("") +
+  geom_path(aes(y=varprop, x=1:16)) + 
+  geom_text(aes(x=1:16, y=varprop, label=round(varprop, 2)), vjust=1, col="white", size=5) +
+  scale_y_continuous(breaks=seq(0, .6, .2), labels = scales::percent) + 
+  scale_x_continuous(breaks=1:10)
+```
+After running a scree plot, that shows the variance explained by each PC, it appears that it takes 7 PCs for the cumulative proportion of the variances to be greater than 80%. It appears that not one PC can strongly explain the data's variance.
+
+
+#### Interpreting PCs:
+```{r}
+summary(poke_pca, loadings=T)
+
+```
+ Could see the different variables in the PCA by running `summary()` function on the PCA object. Here we can view Loadings, which contain the principal components and the variance each PC explains. 
+Looking at the Loadings, it appears that PC1 explains the relationship relationship between tuition rates and costs, both in and out of state with the proportion of minority at the institution. It is consistent with the previous findings that the higher the cost of a college the lower the percentage of minorities will make up the student population. PC2 appears to explain how increasing proportion of a white student population will result in lower proportions of minorities, which is expected!PC3 appears to show how large colleges, indicated by large total enrollment, have lower proportion of Black students. It appears that these relationships are not as strong due to the low variance explained by each PC.
+
+
+
+#### Visualize scores.
+
+Plot of Loadings
+```{r}
+poke_pca$loadings[1:16, 1:2] %>% as.data.frame %>% rownames_to_column %>%
+ggplot() + geom_hline(aes(yintercept=0), lty=2) +
+  geom_vline(aes(xintercept=0), lty=2) + ylab("PC2") + xlab("PC1") +
+  geom_segment(aes(x=0, y=0, xend=Comp.1, yend=Comp.2), arrow=arrow(), col="red") +
+  geom_label(aes(x=Comp.1*1.1, y=Comp.2*1.1, label=rowname))
+```
+Angles between vectors show correlation between the various variables. This ggplot of the various Variables allows us to visually see how the different variables interact with one another on PC1 and PC2.
+
+Plotting Data with respect to the first 3 PCs.
+```{r}
+pokedf<-data.frame(Name=combined_final_wide$name, PC1=poke_pca$scores[, 1],PC2=poke_pca$scores[, 2],PC3=poke_pca$scores[, 3])
+
+ggplot(pokedf, aes(PC1, PC2,color = combined_final_wide$type)) + geom_point() + scale_color_discrete(name = "College Type")
+
+ggplot(pokedf, aes(PC2, PC3,color = combined_final_wide$total_enrollment)) + geom_point() + scale_color_gradient2(low="red",mid="white",high="blue",name = "College Size")
+```
+A ggplot was done to visualize the first three PCS against each other with the various variables mapped to them so groupings can be identified. In the first plot, it is evident that PC1 strongly separates the private and public colleges, which are explained by the relationship between minority and high tuition rates. In the second plot, PC3 dependence on College size (which comes from total enrollment), can be seen by the gradient. Low college populations are the very white points and although there are not that many very dark points,indicative of a large student population, the distinct grouping can be seen.
+
+
+
+
+```{r eval=F}
+## paste this chunk into the ```{r setup} chunk at the top of your project 1 .Rmd file
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+
+
+```
+...
+
+
+
+
+

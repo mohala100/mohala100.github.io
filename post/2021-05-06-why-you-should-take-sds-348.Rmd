@@ -1,0 +1,17 @@
++++
+title = ""
+description = ""
+tags = []
+categories = []
++++
+hi ho3 qr4 you
+
+[Link to project 1](/project/project1/)
+
+[Link to google](https://www.google.com)
+
+```{r}
+print('hello moto')
+```
+
+![](Home/website/static/img/forWebby.jpeg)
